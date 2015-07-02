@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:gravity="center"
+      android:background="@drawable/whole_background">
+
+    <!--
+    CalendarView 
+      android:background="#000000" 
+    android:layout_width="350dp" 
+    android:layout_height="300dp"
+    android:showWeekNumber="false"
+    android:selectedWeekBackgroundColor="#FFFFFF"></CalendarView
+    -->
+
+    <DatePicker
+        android:id="@+id/dpExpDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false" />
+
+    <Button
+        android:id="@+id/btDone"
+        android:layout_width="114dp"
+        android:layout_height="50dp"
+        android:text="Done"
+        android:textColor="@color/Dark_Yellow"
+        android:textStyle="bold" />
+
+</LinearLayout>

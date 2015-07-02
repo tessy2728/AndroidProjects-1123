@@ -1,0 +1,32 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/icLog"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_log"
+        android:icon="@drawable/text_x_log"/>
+	<item
+        android:id="@+id/icSettings"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_menu_settings_holo_light">
+	    <menu>
+	        <group android:checkableBehavior="single">
+	        <item android:id="@+id/subitem1" 	 
+	            android:checked="true"	   
+	            android:title="@string/Simple"
+	        <item android:id="@+id/subitem2"	          
+	            android:title="@string/Expression"
+	            android:checked="false"/>
+	        </group>
+	    </menu>
+	</item>
+	<item
+        android:id="@+id/icClose"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_close"
+        android:icon="@drawable/btn_close_normal"/>
+</menu>

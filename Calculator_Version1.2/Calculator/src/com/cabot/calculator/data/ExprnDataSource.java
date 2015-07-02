@@ -1,0 +1,128 @@
+package com.cabot.calculator.data;
+
+import java.util.ArrayList;
+import java.util.List;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+public class ExprnDataSource {
+
+	private SQLiteDatabase database;
+	private ConnectionClass dbHelper;
+	private String[] columns={ ConnectionClass.EXP_TAB_COL_ID, ConnectionClass.EXP_TAB_COL_VALUE, ConnectionClass.EXP_TAB_COL_DATE };
+	
+	//constructor
+	public ExprnDataSource(Context context) 
+	{
+		dbHelper=new ConnectionClass(context);
+	}
+	
+	//opens database connection
+	public void open()throws SQLException
+	{
+		 database=dbHelper.getWritableDatabase();
+	}
+	
+	//closes database connection
+	public void close()
+	{
+		dbHelper.close();
+	}
+	
+	//insert one expression in database
+	public void addExpr(String exprn,long ts)
+	{
+		open();
+		ContentValues values=new ContentValues();
+		values.put(columns[1], exprn);
+		values.put(columns[2], ts);
+		database.insert(dbHelper.TABLE_EXPS, null, values);
+		close();
+	}
+	
+	//Retrieve expression using time stamp
+	public Expression getExprn(long timeStamp)
+	{
+		database = dbHelper.getWritableDatabase();
+		Cursor cursor=database.query(dbHelper.TABLE_EXPS, columns, columns[2] +"=?",new String[] {String.valueOf(timeStamp)}, null, null, null);
+		if (cursor != null)
+	        cursor.moveToFirst();
+		Expression exp=changeToExprn(cursor);
+		return exp;
+	}
+	
+	//retrieve all the expressions in database
+	public ArrayList<Expression> getAllExpressions()
+	{
+		ArrayList<Expression> exprList=new ArrayList<Expression>();
+		String query="SELECT * FROM "+dbHelper.TABLE_EXPS;
+		open();
+		Cursor cursor=database.rawQuery(query, null);
+		if(cursor.moveToFirst())
+		{
+			do
+			{
+				Expression exprn=new Expression(cursor.getLong(0),cursor.getString(1),cursor.getLong(2));
+				exprList.add(exprn);
+			}while(cursor.moveToNext());
+		}
+		close();
+		return exprList;
+	}
+	
+	//To get the count of expressions in database
+	public int getCount()
+	{
+		String countQuery="SELECT COUNT(*) FROM "+dbHelper.TABLE_EXPS;
+		open();
+		Cursor cursor=database.rawQuery(countQuery, null);
+		close();
+		return cursor.getCount();
+	}
+	
+	//To remove a Expression from the database
+	public void removeExprn(Expression exprn)
+	{
+		open();
+		Log.i("", ""+exprn.getExprn());
+		String deleteSQL="DELETE FROM "+dbHelper.TABLE_EXPS+" WHERE "+columns[0]+"="+exprn.getID();
+		Log.i("In log", deleteSQL);
+		//database.delete(dbHelper.TABLE_EXPS, columns[0] + "=?" , new String[] {String.valueOf(exprn.getID())});
+		database.execSQL(deleteSQL);
+		close();
+	}
+	
+	//To remove all expressions
+	public void removeAll()
+	{
+		open();
+		String deleteSQL="DELETE FROM "+dbHelper.TABLE_EXPS;
+		database.execSQL(deleteSQL);
+		close();
+	}
+	
+	//To remove the selected expressions
+	public void removeSelected(List<Expression> expr)
+	{
+		open();
+		for(int i=0;i<expr.size();i++)
+		{
+			String deleteSQL="DELETE FROM "+dbHelper.TABLE_EXPS +" WHERE "+columns[1]+"='"+expr.get(i).getExprn()+
+					"' and " +columns[2]+"=" +expr.get(i).getTimeStamp();
+			database.execSQL(deleteSQL);
+			
+		}
+		close();
+	}
+	
+	//To change the returned cursor to Expression
+	public Expression changeToExprn(Cursor c)
+	{
+		Expression exp=new Expression(c.getLong(0),c.getString(1),c.getLong(2));
+		return exp;
+	}
+}

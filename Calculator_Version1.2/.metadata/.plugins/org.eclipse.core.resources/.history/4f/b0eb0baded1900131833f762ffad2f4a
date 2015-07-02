@@ -1,0 +1,112 @@
+package com.cabot.calculator.fragments;
+
+import java.util.Date;
+
+import com.example.calculator.R;
+import com.example.calculator.R.layout;
+
+import android.app.SearchManager;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.text.Layout;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.DatePicker.OnDateChangedListener;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
+public class SearchDialogFragment extends DialogFragment implements OnClickListener{
+	private EditText mEditText;
+	public int layoutID;
+	public String heading;
+	Button btdone;
+	DatePicker searchDate,searchSDate,searchEDate;
+	Date dateSelected,startDate,endDate;
+	public interface inputDialogListener {
+        void onFinishEditDialog(Date searchDate);
+        void onFinishEditDialog(String searchText);
+        void onFinishEditDialog(Date searchStartDate,Date searchEndDate);
+    }
+	
+	public SearchDialogFragment()
+	{
+		
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+	 super.onCreateView(inflater, container, savedInstanceState);
+	 View view = inflater.inflate(layoutID, container);
+     
+     getDialog().setTitle(heading);
+     
+     //if layout for searching by date 
+     if(layoutID==R.layout.search_dialog_search_by_date)
+     {
+    	 btdone=(Button) view.findViewById(R.id.btDone);
+    	 btdone.setOnClickListener(this);
+    	 searchDate=(DatePicker) view.findViewById(R.id.dpExpDate);
+     }
+     
+     //if layout is for searching between dates 
+     if(layoutID==R.layout.search_dialog_bt_date)
+     {
+    	 btdone=(Button) view.findViewById(R.id.btSDone);
+    	 btdone.setOnClickListener(this);
+    	 searchSDate=(DatePicker) view.findViewById(R.id.dpExpSDate);
+    	 searchEDate=(DatePicker) view.findViewById(R.id.dpExpEDate);
+     }
+     
+     //if layout is for search by text
+     if(layoutID==R.layout.search_dialog_by_text)
+     {
+    	 mEditText = (EditText) view.findViewById(R.id.etSearch);
+    	 btdone=(Button) view.findViewById(R.id.btGo);
+    	 btdone.setOnClickListener(this);
+     }
+     
+     return view;
+	}
+	@Override
+	public void onClick(View v) {
+		inputDialogListener activity = (inputDialogListener) getActivity();
+		
+		if(v.getId()==R.id.btDone)
+		{
+		int sday=searchDate.getDayOfMonth();
+		int smonth=searchDate.getMonth();
+		int syear=searchDate.getYear();
+		dateSelected=new Date(syear,smonth,sday);
+        activity.onFinishEditDialog(dateSelected);
+		}
+		
+		if(v.getId()==R.id.btSDone)
+		{
+			int startDay=searchSDate.getDayOfMonth();
+			int startMonth=searchSDate.getMonth();
+			int startYear=searchSDate.getYear()-1900;
+			startDate=new Date(startYear,startMonth,startDay);
+			endDate=new Date(searchEDate.getYear()-1900, searchEDate.getMonth(), searchEDate.getDayOfMonth()+1);
+	        activity.onFinishEditDialog(startDate,endDate);
+		}
+		if(v.getId()==R.id.btGo)
+		{
+			String text=""+mEditText.getText();
+			activity.onFinishEditDialog(text);
+		}
+		this.dismiss();
+	}
+	
+	
+}

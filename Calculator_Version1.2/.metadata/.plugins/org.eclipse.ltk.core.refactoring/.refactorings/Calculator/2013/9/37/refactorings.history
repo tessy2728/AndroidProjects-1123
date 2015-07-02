@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;com.cabot.calculator.activities.MainActivity&apos; to &apos;CalculatorActivity&apos;&#x0A;- Original project: &apos;Calculator&apos;&#x0A;- Original element: &apos;com.cabot.calculator.activities.MainActivity&apos;&#x0A;- Renamed element: &apos;com.cabot.calculator.activities.CalculatorActivity&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;MainActivity&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;com.cabot.calculator.activities{MainActivity.java[MainActivity" matchStrategy="1" name="CalculatorActivity" qualified="false" references="true" similarDeclarations="false" stamp="1378799219031" textual="false" version="1.0"/>
+</session>

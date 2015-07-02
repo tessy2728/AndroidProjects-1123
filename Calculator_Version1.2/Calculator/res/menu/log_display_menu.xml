@@ -1,0 +1,39 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/search"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_search"
+        android:icon="@drawable/abs__ic_search_api_holo_light"
+        >
+        <menu>
+            <item android:id="@+id/sbytext"
+                android:title="By text"
+                android:actionViewClass="search_view"/>
+            <item android:id="@+id/sbydate"
+                android:title="By date"/>
+            <item android:id="@+id/sbtdate"
+                android:title="Between Dates"/>
+        </menu>
+    </item>
+   <!--  android:actionViewClass="com.actionbarsherlock.widget.SearchView"-->
+    <item android:id="@+id/delete"
+       android:orderInCategory="100"
+        android:showAsAction="always" 
+        android:title="@string/action_Delete"
+        android:icon="@drawable/content_discard"
+        android:visible="false"/>
+    <item android:id="@+id/icClear"
+       android:orderInCategory="100"
+        android:showAsAction="always" 
+        android:title="@string/action_clear"
+        android:icon="@drawable/remove_from_shopping_cart"/>
+    <item android:id="@+id/icBack"
+       android:orderInCategory="100"
+        android:showAsAction="always" 
+        android:title="@string/action_back"
+        android:icon="@drawable/navigation_back"/>
+    
+    
+</menu>

@@ -1,0 +1,748 @@
+package com.cabot.calculator.activities;
+
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.cabot.calculator.classes.Calculations;
+import com.cabot.calculator.data.ExprnDataSource;
+import com.example.calculator.R;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.text.Editable;
+import android.text.Layout;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+/**
+ * @author Tessy
+ *
+ */
+public class MainActivity extends SherlockActivity implements OnClickListener{
+	//Operators to set the current operation
+	 public final char PLUS='+';
+	 public final char MINUS='-';
+	 public final char DIVISION='/';
+	 public final char MULTIPLY='X';
+	 public final char MODE='%';
+	 //Running modes
+	 public final char EXPMODE='E',SIMPLE='S';
+	 
+	 public char operation='N',prevOp='N',prevOpErr='N',runmode=SIMPLE;
+	 private double result,num1=0,num2=0,status=0,decstatus=0,number1status=0;
+	 
+	 //for saving only valid expressions in DB a boolean value is maintained
+	 public boolean exprValidity=false;
+	 
+	 //Widget references
+	 EditText text;//represents the actual operation screen
+	 EditText expText;//represents the expression screen
+	 Button sevenBt,eightBt,nineBt,zeroBt,oneBt,twoBt,threeBt,fourBt,fiveBt, 
+	         sixBt,plusBt,minusBt,decBt;
+	 Button sqrtBt,modeBt,oneByXBt,clearBt,equalBt,divBt,multipBt,exitBt;
+	 Bundle exprBundle;
+	 ImageButton back;
+	 TextView tvRunMode;
+	 ExprnDataSource eds;
+	 public String expression;
+	 MenuItem misimple,miexp;
+	
+    @Override
+   
+    protected void onCreate(Bundle savedInstanceState) {
+    	
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main); 
+        
+        text=(EditText)findViewById(R.id.screen);
+        expText=(EditText)findViewById(R.id.upscreen);
+        
+        sevenBt=(Button) findViewById(R.id.btseven);      
+        sevenBt.setOnClickListener(this); 
+        
+        eightBt=(Button) findViewById(R.id.bteight);       
+        eightBt.setOnClickListener(this);
+        
+        nineBt=(Button) findViewById(R.id.btnine);        
+        nineBt.setOnClickListener(this);
+        
+        zeroBt=(Button) findViewById(R.id.btzero);
+        zeroBt.setOnClickListener(this);
+        
+        oneBt=(Button) findViewById(R.id.btone);
+        oneBt.setOnClickListener(this);
+        
+        twoBt=(Button) findViewById(R.id.bttwo);        
+        twoBt.setOnClickListener(this);
+        
+        threeBt=(Button) findViewById(R.id.btthree);       
+        threeBt.setOnClickListener(this);
+        
+        fourBt=(Button) findViewById(R.id.btfour);       
+        fourBt.setOnClickListener(this);
+        
+        fiveBt=(Button) findViewById(R.id.btfive);
+        fiveBt.setOnClickListener(this);
+        
+        sixBt=(Button) findViewById(R.id.btsix);
+        sixBt.setOnClickListener(this);
+        
+        plusBt=(Button) findViewById(R.id.btplus);       
+        plusBt.setOnClickListener(this);
+        
+        minusBt=(Button) findViewById(R.id.btminus);       
+        minusBt.setOnClickListener(this);
+        
+        multipBt=(Button) findViewById(R.id.btmultip);
+        multipBt.setOnClickListener(this);
+        
+        divBt=(Button) findViewById(R.id.btdiv);
+        divBt.setOnClickListener(this);
+        
+        equalBt=(Button) findViewById(R.id.btequal);
+        equalBt.setOnClickListener(this);
+        
+        clearBt=(Button) findViewById(R.id.btclear);
+        clearBt.setOnClickListener(this);
+        
+        oneByXBt=(Button) findViewById(R.id.bt1byx);
+        oneByXBt.setOnClickListener(this);
+        
+        modeBt=(Button) findViewById(R.id.btmode);
+        modeBt.setOnClickListener(this);
+        
+        sqrtBt=(Button) findViewById(R.id.btsqrt);
+        sqrtBt.setOnClickListener(this);
+        
+        decBt=(Button) findViewById(R.id.btdecimal);
+        decBt.setOnClickListener(this);
+        
+        back=(ImageButton) findViewById(R.id.btdelete);
+        back.setOnClickListener(this);
+        
+        tvRunMode=(TextView) findViewById(R.id.tvMode);
+        text.setText("0"); 
+        text.setSelection(text.getText().length());
+        text.requestFocus();
+        
+        
+    }
+    
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	if(resultCode==2)
+	{
+		text.setText(data.getStringExtra("expr"));
+		runmode=EXPMODE;
+		 tvRunMode.setText(R.string.Expression);
+		 if(misimple.isChecked())
+		 {
+			 misimple.setChecked(true);
+			 miexp.setChecked(true);
+		 }
+		status=1;
+		text.setSelection(text.getText().length());
+	}
+	text.setSelection(text.getSelectionStart());
+	text.requestFocus();
+}
+
+   @Override
+public boolean onCreateOptionsMenu(Menu menu) {
+	   
+	   getSupportMenuInflater().inflate(R.menu.calculator_page_menu, menu);
+	   misimple=(MenuItem) menu.findItem(R.id.subitem1);
+       miexp=(MenuItem) menu.findItem(R.id.subitem2);
+	return super.onCreateOptionsMenu(menu);
+}
+   //will be called when a menu item is selected
+    @Override
+    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+    	switch(item.getItemId())
+    	{
+    	case R.id.icClose:this.finish();
+    	case R.id.icLog:
+    					Intent intent=new Intent(MainActivity.this,LogDisplayActivity.class);
+						startActivityForResult(intent,1);
+						
+						
+						break;
+    	case R.id.subitem1:	runmode='O';
+    						tvRunMode.setText(R.string.Simple);
+    						misimple.setChecked(true);
+    						
+							break;
+    	case R.id.subitem2:	runmode=EXPMODE;
+    						tvRunMode.setText(R.string.Expression);
+    						miexp.setChecked(true);
+							break;
+		default:break;
+    	}
+    	
+    	return super.onOptionsItemSelected(item);
+    }
+    
+
+    //Code to handle the division by zero error
+    public void handleDivisionByZero(String temp,String uptemp)
+    {
+			num2=setNumber(temp);
+			if(num2==0)
+			{
+				text.setText(getString(R.string.infinity));
+				prevOp='N';
+			}
+    }
+    
+    //code to handle once a syntax error syntax error
+    public void clearSyntaxError(String temp)
+    {
+    	if(temp.equals(getString(R.string.syntax_error)))
+    	{
+    		text.setText("0");
+    		number1status=0;
+			decstatus=0;
+			status=0;
+    	}
+    }
+    
+    //For extracting the operands
+    public void extract(char operator)
+    {
+    	String temp = text.getText().toString();
+    	String uptemp=expText.getText().toString();
+    	num1=setNumber(temp);  
+    	if(number1status==0)
+    	{
+    		expression=""+num1;
+    		number1status=1;
+    	}
+		String exp=replaceOperator(uptemp,temp,operator);
+		expText.setText(exp);
+		operation=operator;
+		text.setText("");
+		status=0;
+		decstatus=0;
+    }
+    
+    //For performing the operation
+    public void operate(double num1, double num2)
+    {
+    	Calculations cp;
+    	expression=expression+""+operation+""+num2;
+    	switch(operation)
+	    {
+	    case PLUS:	cp=new Calculations(num1,num2);
+	    			result=cp.addition();
+	    			text.setText(""+result);
+	    			exprValidity=true;
+	    			break; 
+	    case MINUS:cp=new Calculations(num1,num2);
+					result=cp.subtraction(); 
+					text.setText(""+result);
+					exprValidity=true;
+					break;
+	    case DIVISION:cp=new Calculations(num1,num2);	    			
+					result=cp.division();
+					text.setText(""+result);
+					exprValidity=true;
+					break;
+	    case MULTIPLY:cp=new Calculations(num1,num2);	    			
+					result=cp.multiply(); text.setText(""+result);
+					exprValidity=true;break;
+	    case MODE:cp=new Calculations(num1,num2);
+					result=cp.modulo(); text.setText(""+result);
+					exprValidity=true;break;
+	    case 'N':text.setText("No operation");prevOp='E';
+	    			exprValidity=false;
+					status=0;break;
+	    default:break;
+	    } 
+    }
+    public static boolean isOperator(char op){
+        if (op == '+' || op == '-' || op == 'X' || op == '/' || op == '%')
+            return true;
+        return false;
+    }
+    
+  //method for handling the click event of various digit buttons
+    public void setValue(String str)
+    {
+    	clearSyntaxError(text.getText().toString());
+    	if(prevOp=='=' && runmode!=EXPMODE)
+    	{
+    	num1=0;
+		num2=0;
+		status=0;
+		decstatus=0;
+		prevOp='N';
+		operation='N';
+		}
+    	if(status==0)
+		{
+    			
+			 	text.setText(str);
+			 	status=1;
+		}
+		else
+			text.setText(text.getText()+""+str);
+    }
+    
+    //code to backspace
+    public void backValues()
+    {
+    	String input=text.getText().toString();
+    	int len=input.length();
+    	input=input.substring(0, len-2);
+    	text.setText(input);
+    }
+    
+    //replace the previous operator in case or repeated clicking of operators
+    public String replaceOperator(String uptemp,String temp,char operator)
+    {
+    	String exp="";
+    	if(!uptemp.equals("") && isOperator(uptemp.charAt(uptemp.length()-1)) && uptemp.charAt(uptemp.length()-1)!=operator)
+		{  	
+    		
+    		num2=setNumber(temp);	
+			if(num1!=0 && num2!=0)
+				exp=text.getText()+" "+operator;
+			else
+			{
+				exp=uptemp.substring(0,uptemp.length()-1)+operator;	
+				num1=setNumber(uptemp.substring(0,uptemp.length()-1));
+			}
+		}
+		else		
+			exp=text.getText()+" "+operator;
+    	return exp;
+    }
+    
+    /*if there is any previous operation to be carried out
+     * this will handle that 
+     */
+    public void handlePrevOp(char op)
+    {   	
+    	num1=result;
+		operation=op;
+		expText.setText(""+num1+op);	
+    }
+    
+    /*
+     * convert the string entered to number 
+     */
+    public double setNumber(String temp)
+    {   
+    	if(!temp.equals(""))
+			return Double.parseDouble(temp);
+		else
+			return 0;
+    }
+    
+    /*
+     * Method to store valid expressions in database
+     */
+    public void storeExpr()
+    {
+    	if(exprValidity)
+    	{
+    		ExprnDataSource eds=new ExprnDataSource(MainActivity.this);
+    		long timeStamp=System.currentTimeMillis();
+    		eds.addExpr(expression, timeStamp);
+    		Toast.makeText(this, "Expression saved successfully", Toast.LENGTH_SHORT).show();
+    	}
+    }
+    
+    @Override
+    public void onClick(View v) {   
+    	//each click event will be handled here
+    	String temp = text.getText().toString();	
+		String uptemp=expText.getText().toString();
+		try
+		{
+    	switch(v.getId())
+    	{
+    	//each time the digit buttons are pressed
+    	case R.id.btzero:if(status==0)
+							text.setText(getText(R.string.zero).toString());		 					  			 	
+						else
+							text.setText(temp+getText(R.string.zero).toString());									
+						break;
+    	case R.id.btone:setValue(getText(R.string.one).toString());
+						break;
+    	case R.id.bttwo:setValue(getText(R.string.two).toString());
+						break;
+    	case R.id.btthree:setValue(getText(R.string.three).toString());
+						break;
+    	case R.id.btfour:setValue(getText(R.string.four).toString());
+    					break;
+    	case R.id.btfive:setValue(getText(R.string.five).toString());
+    					break;
+    	case R.id.btsix:setValue(getText(R.string.six).toString());
+						break;
+    	case R.id.btseven:setValue(getText(R.string.seven).toString());
+    						break;
+    	case R.id.bteight:setValue(getText(R.string.eight).toString());
+							break;
+    	case R.id.btnine:setValue(getText(R.string.nine).toString());
+    						break;
+    	case R.id.btdelete:if(runmode==EXPMODE)
+							{
+								text.setText(temp.substring(0,temp.length()-1).toString());
+								if(temp.charAt(temp.length()-1)=='.')
+									decstatus=0;				
+							}
+							else
+							{
+								text.setText("0");
+								num2=0;
+								status=0;
+							}
+							break;
+    			//each time the 1/x button is clicked
+    	case R.id.bt1byx:double x=0;
+    					if(runmode==EXPMODE)
+						{
+    						clearSyntaxError(temp);
+        					temp=""+text.getText();
+							Calculations cp1=new Calculations();
+							result=cp1.evaluate_Expr(temp);
+							expression="1/("+temp+")";
+							expText.setText("1/("+temp+")");
+							x=result;
+							result=1/x;
+							text.setText(""+result);
+							status=0;
+							prevOp='r';
+							storeExpr();
+							break;
+						}
+    					
+    				num2=setNumber(temp);
+    				if(prevOp=='='  || prevOp=='s' || prevOp=='r' || prevOp=='O')
+    					x=result;
+    				else
+    				{
+    					if(num1!=0 && num2!=0)
+    					{
+    						operate(num1,num2);
+    						x=result;
+    					}
+    					else
+    						x=Double.parseDouble(text.getText().toString());
+    				}
+						result=1/x;					
+						expText.setText("1"+"/"+text.getText());
+						text.setText(""+result);
+						if((""+text.getText()).equals("Infinity"))
+						{
+							num1=0;num2=0;
+							prevOp='N';
+							status=0;
+							break;
+						}
+						status=0;
+						prevOp='r';
+						expression="1/("+expression+")";
+						storeExpr();
+						break;
+			//each time the clear button is clicked
+    	case R.id.btclear:text.setText("0");
+							expText.setText("");
+							num1=0;
+							num2=0;
+							status=0;
+							decstatus=0;
+							prevOp='N';
+							operation='N';
+							break;
+    	case R.id.btdecimal:if(decstatus==0)
+							{
+    						String exp="";
+    							if(status==0)
+    							{
+    								exp=""+getText(R.string.zero)+getText(R.string.decimal);
+    								status=1;
+    							}
+    							else
+    							{
+    								for(int i=0;i<temp.length();i++)
+    									if(temp.charAt(i)=='.')
+    										exp=temp.substring(0,i-1)+getText(R.string.decimal);
+    								exp=text.getText()+""+getText(R.string.decimal);
+    							}
+    							text.setText(exp);
+    							
+    								decstatus=1;
+							}
+    						break;
+    	case R.id.btdiv:if(runmode==EXPMODE)
+						{
+    						clearSyntaxError(temp);
+							text.setText(text.getText().toString()+DIVISION);
+							decstatus=0;
+							break;
+						}
+    					if(prevOp=='/')
+    					{
+    						handleDivisionByZero(temp,uptemp);
+    						if(prevOp=='N')
+    							break;
+    					}
+    					if(prevOp=='=' || prevOp=='s' || prevOp=='r' )
+    					{
+        					handlePrevOp(DIVISION);
+    					}
+        				else
+        				{
+        					num2=setNumber(temp);
+        					if(num1!=0 && num2!=0)
+        					{
+        						expText.setText(""+num2);
+        						operate(num1,num2);
+    			
+        					}
+    					extract(DIVISION);
+        				}
+    					prevOp='/';
+    					break;
+    	
+    	case R.id.btequal:
+    				if(runmode==EXPMODE)
+    				{
+    					Calculations cp1=new Calculations();
+    					result=cp1.evaluate_Expr(temp);
+    					expText.setText(temp);
+    					text.setText(""+result); 
+    					exprValidity=true;
+    					expression=temp;
+    					number1status=0;
+    					decstatus=1;//
+    					prevOp='=';
+    					storeExpr();
+    					break;
+    				}
+    					if(prevOp=='N')
+    					{
+    						expText.setText(text.getText().toString());
+    					}
+    					String exp="";   		
+    					if(status==0 && temp.equals(""))
+    					{
+    						num2=num1;
+    						exp=uptemp+num2;
+    						
+    					} 
+    					else 
+    					{
+    						if(prevOp=='=')
+    						{
+    							num2=setNumber(temp);
+    							for (int i = 0; i < uptemp.length(); i++)
+    								if (isOperator(uptemp.charAt(i)))   	    	
+    									exp=temp+uptemp.substring(i,uptemp.length());
+    							expression=""+num1;
+    						}
+    						else
+    						{
+    							num2=setNumber(temp);
+    							exp=uptemp+num2;						
+    						}
+    					}    					    			
+    					expText.setText(exp); 
+    					operate(num1,num2);   	    
+    					status=0; 
+    					number1status=0;
+    					prevOp='=';
+    					storeExpr();
+    					break;
+    	case R.id.btminus:if(runmode==EXPMODE)
+							{
+    							clearSyntaxError(temp);
+								text.setText(""+text.getText()+MINUS);
+								decstatus=0;
+								break;
+							}
+    						if(prevOp=='/')
+    						{
+    							handleDivisionByZero(temp,uptemp);
+    							if(prevOp=='N')
+        							break;
+    						}
+    						if(prevOp=='=' || prevOp=='s' || prevOp=='r')
+	    						handlePrevOp(MINUS);
+	    					else
+	    					{
+	    						num2=setNumber(temp);
+	    						if(num1!=0 && num2!=0)
+	    							operate(num1,num2);
+	    						if(status==0)
+	    						{
+	    							text.setText(getText(R.string.minus).toString());
+	    							status=1;
+	    						}
+	    						else
+	    								extract(MINUS);
+	    					}
+	    					prevOp='-';
+	    					break;
+    	case R.id.btplus:if(runmode==EXPMODE)
+    					{
+    						clearSyntaxError(temp);
+    						text.setText(text.getText().toString()+PLUS);
+    						decstatus=0;
+    						break;
+    					}
+    					if(prevOp=='/')
+    					{
+    						handleDivisionByZero(temp,uptemp);
+    						if(prevOp=='N')
+    							break;
+    					}
+    					if((prevOp=='=' || prevOp=='s' || prevOp=='r'))
+    						handlePrevOp(PLUS);
+    					else
+    					{
+    						num2=setNumber(temp);
+    						if(num1!=0 && num2!=0)
+    						{
+    							expText.setText(""+num2);
+    							operate(num1,num2);
+    						}
+    						extract(PLUS);
+    					}
+    					prevOp='+';
+    					break;
+    	case R.id.btmultip:if(runmode==EXPMODE)
+							{
+    							clearSyntaxError(temp);
+								text.setText(text.getText().toString()+MULTIPLY);
+								decstatus=0;
+								break;
+							}
+    					if(prevOp=='/')
+    					{
+    						handleDivisionByZero(temp,uptemp);
+    						if(prevOp=='N')
+    							break;
+    					}
+    				    if(prevOp=='=' || prevOp=='s' || prevOp=='r')
+    						handlePrevOp(MULTIPLY);
+    					else
+    					{
+    						num2=setNumber(temp);
+							if(num1!=0 && num2!=0)
+							{
+								operate(num1,num2);
+							}
+							extract(MULTIPLY);
+    					}
+							prevOp='X';
+							break;
+    	case R.id.btmode:if(runmode==EXPMODE)
+						{
+    						clearSyntaxError(temp);
+							text.setText(text.getText().toString()+MODE);
+							decstatus=0;
+							break;
+						}
+    					if(prevOp=='/')
+    					{
+    						handleDivisionByZero(temp,uptemp);
+    						if(prevOp=='N')
+    							break;
+    					}
+    					num2 = Double.parseDouble(temp);
+    					if(prevOp=='=')
+    						handlePrevOp(MODE);
+    					else
+    					{
+						if(num1!=0 && num2!=0)
+							operate(num1,num2);
+    					extract(MODE);
+    					}
+    					prevOp='%';break;	
+    	case R.id.btsqrt:
+    				if(runmode==EXPMODE)
+    				{
+    					clearSyntaxError(temp);
+    					temp=""+text.getText();
+    					Calculations cp1=new Calculations();
+    					result=cp1.evaluate_Expr(temp);
+    					expression="Sqrt("+temp+")";
+    					expText.setText("sqrt("+temp+")");
+    					num1=result;
+    					result=Math.sqrt(num1);
+						text.setText(""+result);
+						num1=result;
+						num2=0;
+						status=0;
+						decstatus=0;
+						prevOp='s';
+						storeExpr();
+						break;
+    				}
+    				if(prevOp=='/')
+					{
+						handleDivisionByZero(temp,uptemp);
+						if(prevOp=='N')
+							break;
+					}
+    					num2 = Double.parseDouble(temp);						
+						if(status==0)
+						{
+							num1=result;
+							expression=""+num1;
+						}
+						else
+						{
+							if(num1!=0 && num2!=0)
+							{
+								operate(num1,num2);
+							}
+							temp = text.getText().toString();
+							num1 = Double.parseDouble(temp);
+						}						
+						result=Math.sqrt(num1);
+						text.setText(""+result);
+						expText.setText("sqrt("+num1+")");
+						num1=result;
+						num2=0;
+						status=0;
+						decstatus=0;
+						prevOp='s';
+						expression="Sqrt("+expression+")";
+						storeExpr();
+						break;
+						
+		default:Toast.makeText(MainActivity.this, getString(R.string.select_valid_option), Toast.LENGTH_SHORT).show();
+    	}  	
+		}
+		catch(NumberFormatException ne)
+		{
+			text.setText(getString(R.string.syntax_error));
+			expText.setText("");
+			exprValidity=false;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+    	 text.setSelection(text.getText().length());
+         text.setSelection(text.getSelectionStart());
+         text.requestFocus();
+    }
+    
+    
+}

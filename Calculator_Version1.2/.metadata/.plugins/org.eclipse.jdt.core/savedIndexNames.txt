@@ -1,0 +1,8 @@
+INDEX VERSION 1.126+/home/bijith/Desktop/My folder/Tessy/Calculator_Version1.2/.metadata/.plugins/org.eclipse.jdt.core
+1628266423.index
+292409679.index
+4132254105.index
+3600913832.index
+1687185013.index
+573939911.index
+2924666878.index

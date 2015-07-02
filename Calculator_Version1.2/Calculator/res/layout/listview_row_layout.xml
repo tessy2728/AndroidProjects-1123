@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:orientation="horizontal"
+    android:clickable="true" >
+  <CheckBox
+        android:id="@+id/check"
+        android:button="@drawable/btn_check"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:focusable="false"
+        android:clickable="true"
+        
+        android:text="" >
+    </CheckBox>
+    <TextView
+        android:id="@+id/tvExpr"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content" 
+        android:clickable="true"
+        android:singleLine="true"
+        android:textColor="@color/dark_yellow"/>  
+	<TextView
+        android:id="@+id/tvTimeStamp"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:textSize="10sp"
+       android:singleLine="false"
+        android:textColor="@color/dark_yellow"/>
+
+	<ImageButton android:id="@+id/btdelete"
+               android:layout_width="30dp"
+               android:layout_height="30dp"
+               android:focusable="true" 
+               android:layout_gravity="center"
+               android:background="@drawable/ic_action_delete">
+	     </ImageButton>
+  
+</LinearLayout>
